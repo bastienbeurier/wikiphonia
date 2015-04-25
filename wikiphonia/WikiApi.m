@@ -46,8 +46,6 @@
     [[WikiApi sharedClient] GET:@"w/api.php" parameters:parameters success:^(NSURLSessionDataTask *task, id JSON) {
         NSDictionary *pages = [[JSON valueForKeyPath:@"query"] valueForKey:@"pages"];
         
-        NSLog(@"JSON: %@", JSON);
-        
         for (NSString *key in pages) {
             if (![key isEqualToString:@"-1"]) {
                 NSMutableDictionary *page = [pages valueForKey:key];

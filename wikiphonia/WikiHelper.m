@@ -35,10 +35,11 @@
         NSInteger sectionStart = [[matches objectAtIndex:i] range].location + [[matches objectAtIndex:i] range].length;
         NSInteger sectionEnd = [[matches objectAtIndex:i+1] range].location;
         NSRange sectionRange = NSMakeRange(sectionStart, sectionEnd - sectionStart);
-        [sections addObject:[extract substringWithRange:sectionRange]];
+        NSString *section = [WikiHelper removeParentheses:[extract substringWithRange:sectionRange]];
+        [sections addObject:section];
     }
     
-    //Add last section
+    //Add last section.
     NSRange lastHeaderRange = [[matches objectAtIndex:[headers count] - 1] range];
     NSInteger lastSectionStart = lastHeaderRange.location + lastHeaderRange.length;
     NSInteger lastSectionEnd = [extract length];
@@ -47,14 +48,26 @@
         lastSectionEnd = [[matches objectAtIndex:[headers count]] range].location;
     }
 
-    [sections addObject:[extract substringWithRange:NSMakeRange(lastSectionStart, lastSectionEnd - lastSectionStart)]];
+    NSString *lastSection = [WikiHelper removeParentheses:[extract substringWithRange:NSMakeRange(lastSectionStart, lastSectionEnd - lastSectionStart)]];
+    [sections addObject:lastSection];
     
-    //Add intro
+    //Add intro.
     [headers insertObject:@"Introduction" atIndex:0];
     NSRange introSectionRange = NSMakeRange(0, [[matches firstObject] range].location);
-    [sections insertObject:[extract substringWithRange:introSectionRange] atIndex:0];
+    NSString *firstSection = [WikiHelper removeParentheses:[extract substringWithRange:introSectionRange]];
+    [sections insertObject:firstSection atIndex:0];
     
     return @[headers, sections];
+}
+
++ (NSString *)removeParentheses:(NSString *)str {
+    NSMutableString *mutableStr = [str mutableCopy];
+    
+    //Remove parenthesis.
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\s+\\([^()]*\\)" options:0 error:nil];
+    [regex replaceMatchesInString:mutableStr options:0 range:NSMakeRange(0, [mutableStr length]) withTemplate:@""];
+    
+    return mutableStr;
 }
 
 

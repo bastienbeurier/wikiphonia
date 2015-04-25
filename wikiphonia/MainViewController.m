@@ -94,7 +94,7 @@ const unsigned char SpeechKitApplicationKey[] =
     [self.headers removeObjectAtIndex:0];
     
     synthesizerSaid = SS_SECTION_READING;
-    [self speak:[NSString stringWithFormat:@"%@. %@", self.currentHeader, self.currentSection]];
+    [self speak:self.currentSection];
 }
 
 - (void)repeatSection {

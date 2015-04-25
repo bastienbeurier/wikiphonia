@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import <SpeechKit/SpeechKit.h>
+#import <AVFoundation/AVFoundation.h>
 
-@interface MainViewController : UIViewController <SpeechKitDelegate, SKRecognizerDelegate>
+@interface MainViewController : UIViewController <SpeechKitDelegate, SKRecognizerDelegate, AVSpeechSynthesizerDelegate>
 
 
 @end

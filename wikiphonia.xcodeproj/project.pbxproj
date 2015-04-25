@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B07BBB21AEAF97A00DF36FA /* WikiHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B07BBB11AEAF97A00DF36FA /* WikiHelper.m */; };
+		0B07BBB31AEAF97A00DF36FA /* WikiHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B07BBB11AEAF97A00DF36FA /* WikiHelper.m */; };
 		0B91555E1AEAC4650080D300 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B91555D1AEAC4650080D300 /* main.m */; };
 		0B9155611AEAC4650080D300 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B9155601AEAC4650080D300 /* AppDelegate.m */; };
 		0B9155641AEAC4650080D300 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B9155631AEAC4650080D300 /* MainViewController.m */; };
@@ -43,6 +45,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0B07BBB01AEAF97A00DF36FA /* WikiHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WikiHelper.h; sourceTree = "<group>"; };
+		0B07BBB11AEAF97A00DF36FA /* WikiHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WikiHelper.m; sourceTree = "<group>"; };
 		0B9155581AEAC4640080D300 /* wikiphonia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wikiphonia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B91555C1AEAC4650080D300 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0B91555D1AEAC4650080D300 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -141,6 +145,8 @@
 				0B91555B1AEAC4650080D300 /* Supporting Files */,
 				0B9155A51AEADA0B0080D300 /* WikiApi.h */,
 				0B9155A61AEADA0B0080D300 /* WikiApi.m */,
+				0B07BBB01AEAF97A00DF36FA /* WikiHelper.h */,
+				0B07BBB11AEAF97A00DF36FA /* WikiHelper.m */,
 			);
 			path = wikiphonia;
 			sourceTree = "<group>";
@@ -371,6 +377,7 @@
 				0B9155641AEAC4650080D300 /* MainViewController.m in Sources */,
 				0B9155611AEAC4650080D300 /* AppDelegate.m in Sources */,
 				0B91555E1AEAC4650080D300 /* main.m in Sources */,
+				0B07BBB21AEAF97A00DF36FA /* WikiHelper.m in Sources */,
 				0B9155A71AEADA0B0080D300 /* WikiApi.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -380,6 +387,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B9155781AEAC4650080D300 /* wikiphoniaTests.m in Sources */,
+				0B07BBB31AEAF97A00DF36FA /* WikiHelper.m in Sources */,
 				0B9155A81AEADA0B0080D300 /* WikiApi.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

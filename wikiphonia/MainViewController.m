@@ -20,6 +20,9 @@
 @property (strong, nonatomic) NSMutableArray *headers;
 @property (strong, nonatomic) NSMutableArray *sections;
 
+@property (strong, nonatomic) NSString *currentHeader;
+@property (strong, nonatomic) NSString *currentSection;
+
 @end
 
 const unsigned char SpeechKitApplicationKey[] =
@@ -70,10 +73,7 @@ const unsigned char SpeechKitApplicationKey[] =
     [self listenQuery];
 }
 
-- (void)listenQuery {
-    synthesizerSaid = SS_LISTEN_QUERY;
-    [self speak:@"Listening."];
-}
+#pragma mark Reading
 
 - (void)inquireAboutNextSection {
     self.isReading = YES;
@@ -82,25 +82,29 @@ const unsigned char SpeechKitApplicationKey[] =
         synthesizerSaid = SS_SECTION_INQUIRY;
         [self speak:[NSString stringWithFormat:@"Read %@?", [self.headers firstObject]]];
     } else {
-        [self stopReading];
+        [self stopReading:NO];
     }
 }
 
 - (void)readNextSection {
-    NSString *section = [self.sections firstObject];
+    self.currentHeader = [self.headers firstObject];
+    self.currentSection = [self.sections firstObject];
     
     [self.sections removeObjectAtIndex:0];
     [self.headers removeObjectAtIndex:0];
     
     synthesizerSaid = SS_SECTION_READING;
-    [self speak:section];
+    [self speak:[NSString stringWithFormat:@"%@. %@", self.currentHeader, self.currentSection]];
 }
 
-- (void)stopReading {
-    self.isReading = NO;
-    
-    synthesizerSaid = SS_END_OF_ARTICLE;
-    [self speak:@"End of article."];
+- (void)repeatSection {
+    if (self.currentHeader && self.currentSection) {
+        synthesizerSaid = SS_SECTION_READING;
+        [self speak:[NSString stringWithFormat:@"%@. %@", self.currentHeader, self.currentSection]];
+    } else {
+        synthesizerSaid = SS_INSTRUCTION_ERROR;
+        [self speak:@"Nothing to repeat. Please say yes, no, or stop."];
+    }
 }
 
 - (void)skipNextSection {
@@ -108,6 +112,25 @@ const unsigned char SpeechKitApplicationKey[] =
     [self.headers removeObjectAtIndex:0];
     
     [self inquireAboutNextSection];
+}
+
+- (void)stopReading:(BOOL)interrupted {
+    self.isReading = NO;
+    
+    synthesizerSaid = SS_END_OF_ARTICLE;
+    
+    if (interrupted) {
+        [self speak:@"Article dismissed."];
+    } else {
+        [self speak:@"End of article."];
+    }
+}
+
+#pragma mark Recording
+
+- (void)listenQuery {
+    synthesizerSaid = SS_LISTEN_QUERY;
+    [self speak:@"Listening."];
 }
 
 - (void)startRecording {
@@ -122,6 +145,8 @@ const unsigned char SpeechKitApplicationKey[] =
                                                 delegate:self];
 }
 
+#pragma mark Synthetizing
+
 - (void)speak:(NSString *)str {
     AVSpeechSynthesizer *synthesizer = [[AVSpeechSynthesizer alloc] init];
     AVSpeechUtterance *utterance = [[AVSpeechUtterance alloc] initWithString:str];
@@ -130,6 +155,20 @@ const unsigned char SpeechKitApplicationKey[] =
     synthesizer.delegate = self;
     [synthesizer speakUtterance:utterance];
 }
+
+#pragma mark AVSpeechSynthesizer protocol
+
+- (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer didFinishSpeechUtterance:(AVSpeechUtterance *)utterance {
+    if (synthesizerSaid == SS_LISTEN_QUERY || synthesizerSaid == SS_SECTION_INQUIRY) {
+        [self startRecording];
+    } else if (synthesizerSaid == SS_SECTION_READING || synthesizerSaid == SS_INSTRUCTION_ERROR) {
+        [self inquireAboutNextSection];
+    } else if (synthesizerSaid == SS_END_OF_ARTICLE || synthesizerSaid == SS_SPEECH_QUERY_ERROR) {
+        [self listenQuery];
+    }
+}
+
+#pragma mark Recognizing
 
 - (void)instructionRecognized:(SKRecognition *)results {
     long numOfResults = [results.results count];
@@ -142,14 +181,18 @@ const unsigned char SpeechKitApplicationKey[] =
             [self readNextSection];
         } else if ([[[results firstResult] lowercaseString] isEqualToString:@"no"]) {
             [self skipNextSection];
+        } else if ([[[results firstResult] lowercaseString] isEqualToString:@"repeat"]) {
+            [self repeatSection];
+        } else if ([[[results firstResult] lowercaseString] isEqualToString:@"stop"]) {
+            [self stopReading:YES];
         } else {
             synthesizerSaid = SS_INSTRUCTION_ERROR;
-            [self speak:@"Please say yes or no."];
+            [self speak:@"Please say yes, no, stop, or repeat."];
         }
 
     } else {
         synthesizerSaid = SS_INSTRUCTION_ERROR;
-        [self speak:@"Please say yes or no."];
+        [self speak:@"Please say yes, no, stop, or repeat."];
     }
 }
 
@@ -182,7 +225,7 @@ const unsigned char SpeechKitApplicationKey[] =
 }
 
 
-#pragma mark SKRecognizerDelegate methods
+#pragma mark SKRecognizer protocol
 
 - (void)recognizerDidBeginRecording:(SKRecognizer *)recognizer
 {
@@ -208,22 +251,10 @@ const unsigned char SpeechKitApplicationKey[] =
     
     if (self.isReading) {
         synthesizerSaid = SS_INSTRUCTION_ERROR;
-        [self speak:@"Please say yes or no."];
+        [self speak:@"Please say yes, no, stop, or repeat."];
     } else {
         synthesizerSaid = SS_SPEECH_QUERY_ERROR;
         [self speak:@"Please repete."];
-    }
-}
-
-#pragma mark SKRecognizerDelegate methods
-
-- (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer didFinishSpeechUtterance:(AVSpeechUtterance *)utterance {
-    if (synthesizerSaid == SS_LISTEN_QUERY || synthesizerSaid == SS_SECTION_INQUIRY) {
-        [self startRecording];
-    } else if (synthesizerSaid == SS_SECTION_READING || synthesizerSaid == SS_INSTRUCTION_ERROR) {
-        [self inquireAboutNextSection];
-    } else if (synthesizerSaid == SS_END_OF_ARTICLE || synthesizerSaid == SS_SPEECH_QUERY_ERROR) {
-        [self listenQuery];
     }
 }
 
